@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta de Amor Animada</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffe6f2;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            perspective: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+            cursor: pointer;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #ff66b3, #ff99cc);
+            color: white;
+            transform: rotateY(0deg);
+            z-index: 2;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #ff99cc, #ffccdd);
+            color: #555;
+            transform: rotateY(180deg);
+            overflow: hidden;
+        }
+
+        .card.opened {
+            transform: rotateY(180deg);
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff1a75;
+            animation: float 4s ease-in-out infinite;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background-color: #ff1a75;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #e60073;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-150px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .signature {
+            margin-top: 20px;
+            font-style: italic;
+            text-align: right;
+            width: 100%;
+        }
+
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="card" id="card">
+            <div class="card-front">
+                <h2>Para ti ❤️</h2>
+                <p>Toca la carta para abrirla</p>
+            </div>
+            <div class="card-back">
+                <div class="hearts-container" id="hearts-container"></div>
+                <div class="message">
+                    <h2 style="color: #ff1a75;">Mi amor</h2>
+                    <p>Cada día a tu lado es un regalo que atesoro con todo mi corazón.</p>
+                    <p>Eres la razón por la que sonrío cada mañana y el último pensamiento antes de dormir.</p>
+                    <div class="signature">
+                        <p>Con todo mi cariño,</p>
+                        <p>❤️</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="open-btn">Abrir Carta</button>
+        <button id="close-btn">Cerrar Carta</button>
+    </div>
+
+    <script>
+        const card = document.getElementById('card');
+        const openBtn = document.getElementById('open-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const heartsContainer = document.getElementById('hearts-container');
+        let heartsInterval;
+
+        // Abrir carta
+        openBtn.addEventListener('click', () => {
+            card.classList.add('opened');
+            startHearts();
+        });
+
+        // Cerrar carta
+        closeBtn.addEventListener('click', () => {
+            card.classList.remove('opened');
+            stopHearts();
+        });
+
+        // También se puede abrir/cerrar haciendo clic en la carta
+        card.addEventListener('click', () => {
+            card.classList.toggle('opened');
+            if (card.classList.contains('opened')) {
+                startHearts();
+            } else {
+                stopHearts();
+            }
+        });
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.top = '100%';
+            heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heartsContainer.appendChild(heart);
+
+            // Eliminar el corazón después de la animación
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+
+        function startHearts() {
+            // Crear corazones iniciales
+            for (let i = 0; i < 15; i++) {
+                setTimeout(createHeart, i * 200);
+            }
+            // Continuar creando corazones cada cierto tiempo
+            heartsInterval = setInterval(createHeart, 300);
+        }
+
+        function stopHearts() {
+            clearInterval(heartsInterval);
+        }
+    </script>
+</body>
+</html>
